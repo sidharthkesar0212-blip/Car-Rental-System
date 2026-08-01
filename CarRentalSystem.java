@@ -5,6 +5,7 @@ public class CarRentalSystem {
     private List<Car> cars;
     private List<Customer> customers;
     private List<Rental> rentals;
+
     public CarRentalSystem(){
         this.cars = new ArrayList<>();
         this.customers = new ArrayList<>();
@@ -17,6 +18,26 @@ public class CarRentalSystem {
 
     public void addCustomer(Customer customer){
         customers.add(customer);
+    }
+
+    public List<Car> getAvailableCars() {
+        List<Car> availableCars = new ArrayList<>();
+        for (Car c : cars) {
+            if (c.isAvailable()) {
+                availableCars.add(c);
+            }
+        }
+        return availableCars;
+    }
+
+    public List<Car> searchCarsByBrand(String brand) {
+        List<Car> matchingCars = new ArrayList<>();
+        for (Car c : cars) {
+            if (c.getBrand().equalsIgnoreCase(brand)) {
+                matchingCars.add(c);
+            }
+        }
+        return matchingCars;
     }
 
     public void rentCar(Car car, Customer customer, int days){
@@ -51,25 +72,24 @@ public class CarRentalSystem {
             System.out.println("==== Car Rental System ====");
             System.out.println("1. Rent a Car");
             System.out.println("2. Return a Car");
-            System.out.println("3. Exit");
-            System.out.println("Enter your Choice:");
+            System.out.println("3. Search Available Cars by Brand");
+            System.out.println("4. Exit");
+            System.out.print("Enter your Choice: ");
             int choice = sc.nextInt();
             sc.nextLine();
             if(choice == 1){
                 System.out.println(" == Rent a Car == ");
-                System.out.println("Enter your name: ");
+                System.out.print("Enter your name: ");
                 String cName = sc.nextLine();
 
                 System.out.println("Available Cars:");
-                for(Car c:cars){
-                    if(c.isAvailable()){
-                        System.out.println(c.getcarId() + " . " + c.getBrand() + " . " + c.getModel());
-                    }
+                for(Car c : getAvailableCars()){
+                    System.out.println(c.getcarId() + " . " + c.getBrand() + " . " + c.getModel());
                 }
 
-                System.out.println("Enter the car ID you want to rent:");
+                System.out.print("Enter the car ID you want to rent: ");
                 String carid = sc.nextLine();
-                System.out.println("Enter the number of days for rental:");
+                System.out.print("Enter the number of days for rental: ");
                 int days = sc.nextInt();
                 sc.nextLine();
 
@@ -92,7 +112,7 @@ public class CarRentalSystem {
                     System.out.println("Rental days: " + days);
                     System.out.printf("Total Price: Rs.%.2f\n", totalPrice);
 
-                    System.out.println("\n Confirm rental (Y/N): ");
+                    System.out.print("\n Confirm rental (Y/N): ");
                     String confirm = sc.nextLine();
 
                     if(confirm.equalsIgnoreCase("Y")){
@@ -106,7 +126,7 @@ public class CarRentalSystem {
                 }
             }else if(choice == 2){
                 System.out.println("\n=== Return a car ===\n");
-                System.out.println("Enter the car ID you want to return:");
+                System.out.print("Enter the car ID you want to return: ");
                 String carid = sc.nextLine();
 
                 Car toreturn = null;
@@ -126,19 +146,31 @@ public class CarRentalSystem {
                     }
                     if(selected != null){
                         returnCar(toreturn);
-                        System.out.println("Car returned Successfully");
                     }else {
                         System.out.println("Car was not rented or information is missing");
                     }
                 }else{
-                    System.out.println("Invalid Car id or car is nor rented");
+                    System.out.println("Invalid Car id or car is not rented");
                 }
             }else if(choice == 3){
+                System.out.print("Enter Brand to search: ");
+                String searchBrand = sc.nextLine();
+                List<Car> results = searchCarsByBrand(searchBrand);
+                if(results.isEmpty()){
+                    System.out.println("No cars found for brand: " + searchBrand);
+                } else {
+                    System.out.println("Matching Cars:");
+                    for(Car c : results){
+                        String status = c.isAvailable() ? "Available" : "Rented";
+                        System.out.println(c.getcarId() + " - " + c.getBrand() + " " + c.getModel() + " [" + status + "]");
+                    }
+                }
+            }else if(choice == 4){
                 break;
             }else{
-                System.out.println("Invalid Choice,  Please enter a vallid option:");
+                System.out.println("Invalid Choice, Please enter a valid option.");
             }
         }
-        System.out.println("ThankYou for using the system");
+        System.out.println("Thank you for using the system!");
     }
 }
